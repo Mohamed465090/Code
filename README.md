@@ -77,7 +77,6 @@
         <input type="number" id="orderValue" placeholder="أدخل قيمة الأوردر" min="0" value="0">
 
         <button onclick="addPoints()">إضافة النقاط و تحديث السجل</button>
-        <button onclick="redeemPoints()" style="background-color: #ffc107; color: #333;">تحويل النقاط إلى كاش باك</button>
         
         <button onclick="clearPoints()" class="clear-button">🗑️ مسح جميع النقاط (تصفير)</button>
 
@@ -125,7 +124,6 @@
                 return;
             }
 
-            // الحساب: كل 100 جنيه بـ 10 نقاط (يتم استخدام Math.floor للحصول على نقاط المئات الكاملة فقط)
             const newPoints = Math.floor(orderValue / 100) * pointsPer100EGP;
 
             document.getElementById('newPoints').textContent = `نقاط الأوردر الأخير: ${newPoints} نقطة`;
@@ -141,31 +139,8 @@
 
 
         /**
-         * وظيفة تحويل (استبدال) النقاط إلى كاش باك
-         */
-        function redeemPoints() {
-            if (totalPoints <= 0) {
-                alert('ليس لديك نقاط لاستبدالها!');
-                return;
-            }
-
-            const redeemedCashback = (totalPoints * valuePerPoint).toFixed(2);
-            const confirmation = confirm(`هل أنت متأكد من تحويل ${totalPoints} نقطة إلى كاش باك بقيمة ${redeemedCashback} جنيه مصري؟`);
-
-            if (confirmation) {
-                totalPoints = 0;
-                localStorage.setItem('userPoints', totalPoints);
-                animateCounter(totalPoints);
-                document.getElementById('newPoints').textContent = `نقاط الأوردر الأخير: 0 نقطة`;
-                document.getElementById('newCashback').textContent = `كاش باك الأوردر الأخير: 0.00 جنيه`;
-
-                alert(`تم تحويل ${redeemedCashback} جنيه بنجاح! رصيد نقاطك الحالي هو 0.`);
-            }
-        }
-
-
-        /**
          * وظيفة مسح جميع النقاط
+         * تم الإبقاء عليها لأنك لم تطلب حذفها
          */
         function clearPoints() {
             if (totalPoints <= 0) {
@@ -186,6 +161,7 @@
             }
         }
 
+        // تم حذف الدالة redeemPoints() من هنا
 
         /**
          * وظيفة عرض النقاط بشكل عداد متحرك
