@@ -2,330 +2,261 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Duka Points | تطبيق المكافآت</title>
-    <!-- إضافة Font Awesome للأيقونات -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Duka Points | نقاط Duka</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        
-        body {
-            background: #1a1a1a;
-            height: 100vh; display: flex; justify-content: center; align-items: center; 
-            color: white; overflow: hidden;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Cairo', sans-serif; background: #fef7e9; min-height: 100vh; color: #2d3e50; }
 
-        /* --- شاشة البداية المتحركة (Splash Screen) --- */
+        /* الشاشة الافتتاحية */
         #splash-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #d63031; /* أحمر دوكا */
-            display: flex; justify-content: center; align-items: center;
-            z-index: 9999; transition: opacity 0.8s ease;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: #000;
+            display: flex; justify-content: center; align-items: center; z-index: 10000; transition: opacity 0.5s ease;
+            overflow: hidden;
         }
 
-        .splash-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
+        /* حاوية الفيديو لضمان ملء الشاشة */
+        .video-background {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
         }
 
-        /* الأيقونة */
-        .splash-icon {
-            font-size: 90px;
-            color: #fff;
-            text-shadow: 0 0 15px rgba(255,255,255,0.6);
-            opacity: 0;
-            animation: iconPop 0.8s forwards;
-            animation-delay: 0.1s; /* تظهر مع أول حرف تقريباً */
+        #splash-video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100vw;
+            height: 56.25vw; /* نسبة 16:9 */
+            min-height: 100vh;
+            min-width: 177.77vh; /* لضمان تغطية الارتفاع */
+            transform: translate(-50%, -50%) scale(1.2); /* تكبير بسيط لضمان عدم وجود حواف */
+            border: 0;
         }
 
-        @keyframes iconPop {
-            0% {
-                transform: scale(0) rotate(-90deg);
-                opacity: 0;
-            }
-            60% {
-                transform: scale(1.2) rotate(10deg);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(1) rotate(0deg);
-                opacity: 1;
-            }
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 0;
         }
 
-        .loader-text {
-            font-size: 70px;
-            font-weight: 900;
-            letter-spacing: 15px;
-            display: flex;
-            direction: ltr;
-            color: #fff;
-            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+        .splash-content { 
+            position: relative;
+            z-index: 1;
+            width: 100%; 
+            max-width: 450px; 
+            padding: 20px; 
+            text-align: center; 
+            color: white; 
         }
-
-        .loader-text span {
-            display: inline-block;
-            opacity: 0;
-            animation: bounceFlip 0.8s forwards;
-            transform-origin: center;
-        }
-
-        /* توقيت ظهور كل حرف */
-        .loader-text span:nth-child(1) { animation-delay: 0.2s; }
-        .loader-text span:nth-child(2) { animation-delay: 0.5s; }
-        .loader-text span:nth-child(3) { animation-delay: 0.8s; }
-        .loader-text span:nth-child(4) { animation-delay: 1.1s; }
-
-        /* حركة الحروف */
-        @keyframes bounceFlip {
-            0% {
-                transform: translateY(100px) rotate(-20deg) scale(0.5);
-                opacity: 0;
-            }
-            60% {
-                transform: translateY(-20px) rotate(5deg) scale(1.1);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(0) rotate(0deg) scale(1);
-                opacity: 1;
-            }
-        }
-
-        /* --- المحتوى الرئيسي بعد الإخفاء --- */
-        #main-content {
-            display: none; width: 100%; height: 100%;
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.8)), 
-                        url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1350&q=80');
-            background-size: cover; background-position: center;
-            justify-content: center; align-items: center;
-        }
-
-        .container {
-            width: 90%; max-width: 400px; text-align: center; padding: 25px;
-            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px);
-            border-radius: 25px; border: 1px solid rgba(255,255,255,0.2);
-            margin: auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-
-        /* العناصر المشتركة */
-        .logo-circle {
-            background: white; width: 70px; height: 70px; border-radius: 50%;
-            margin: 0 auto 15px; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; border: 3px solid #ffcc00;
-        }
-        input { 
-            width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px; 
-            border: none; text-align: center; font-size: 16px;
-        }
-        .btn { 
-            display: block; width: 100%; padding: 14px; margin-top: 10px; 
-            border-radius: 15px; font-weight: bold; border: none; cursor: pointer; 
-            transition: 0.3s; font-size: 16px;
-        }
-        .btn-red { background: #d63031; color: white; }
-        .btn-white { background: white; color: #d63031; }
-        .btn:active { transform: scale(0.98); }
         
-        .page { display: none; }
-        .active { display: block; }
-        .points-display { background: white; color: #333; padding: 15px; border-radius: 15px; margin: 15px 0; }
-        .points-num { font-size: 40px; font-weight: bold; color: #d63031; }
-
-        .back-link {
-            margin-top: 10px; cursor: pointer; font-size: 12px; color: #ffcc00;
-            transition: color 0.3s;
+        .duka-logo-circle {
+            background: white; border-radius: 50%; width: 130px; height: 130px; margin: 0 auto 30px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            border: 6px solid #333; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
-        .back-link:hover { color: #fff; }
+        .duka-logo-circle .pts { color: #d31111; font-size: 30px; font-weight: 900; line-height: 1; }
+        .duka-logo-circle .brand { color: #333; font-size: 22px; font-weight: 900; }
+
+        .main-title { font-size: 30px; font-weight: 700; margin-bottom: 15px; line-height: 1.3; text-shadow: 2px 2px 4px rgba(0,0,0,0.6); }
+        .description { font-size: 16px; line-height: 1.6; margin-bottom: 35px; opacity: 0.95; text-shadow: 1px 1px 2px rgba(0,0,0,0.6); }
+
+        .btn-splash-white { background: white; color: #d31111; border: none; padding: 16px; border-radius: 15px; font-size: 18px; font-weight: 700; cursor: pointer; width: 100%; margin-bottom: 10px; }
+        .btn-splash-red { background: #ff0000; color: white; border: none; padding: 16px; border-radius: 15px; font-size: 18px; font-weight: 700; cursor: pointer; width: 100%; }
+
+        /* باقي المحتوى الأصلي */
+        #main-content { display: none; padding: 16px; max-width: 500px; margin: 0 auto; }
+        .page { display: none; animation: slideUp 0.4s ease; }
+        .page.active { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .food-card { background: white; border-radius: 25px; padding: 20px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; }
+        .input-group input { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 15px; font-family: 'Cairo'; font-size: 16px; }
+        .points-card { background: linear-gradient(145deg, #fff3e0, #ffe9d6); border-radius: 25px; padding: 25px; display: flex; align-items: center; justify-content: space-between; border: 2px solid #d31111; margin-bottom: 20px; position: relative; }
+        .points-number { font-size: 42px; font-weight: 900; color: #2d3e50; }
+        .points-icon { width: 60px; height: 60px; background: #d31111; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 25px; }
+        .btn-action { background: #d31111; color: white; border: none; padding: 16px; border-radius: 60px; width: 100%; font-size: 18px; font-weight: 700; cursor: pointer; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-reset { background: #666; color: white; border: none; padding: 6px 15px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 12px; display: inline-flex; align-items: center; gap: 6px; }
+        .back-link { text-align: center; margin-top: 20px; color: #d31111; cursor: pointer; font-weight: 600; display: block; }
+        .alert { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: white; padding: 12px 25px; border-radius: 60px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 10001; transition: 0.3s; border-right: 5px solid #d31111; font-weight: 600; }
+        .alert.show { transform: translateX(-50%) translateY(0); }
     </style>
 </head>
 <body>
 
+    <div id="customAlert" class="alert"></div>
+
     <div id="splash-screen">
+        <div class="video-background">
+            <iframe id="splash-video" 
+                src="https://www.youtube.com/embed/WW0SLuX8HsI?autoplay=1&mute=1&controls=0&loop=1&playlist=WW0SLuX8HsI&start=5&modestbranding=1&showinfo=0&rel=0&enablejsapi=1" 
+                frameborder="0" 
+                allow="autoplay; encrypted-media">
+            </iframe>
+        </div>
+        <div class="overlay"></div>
+
         <div class="splash-content">
-            <!-- أيقونة الشيف (أدوات المطبخ) -->
-            <i class="fas fa-utensils splash-icon"></i>
-            <div class="loader-text">
-                <span>D</span><span>U</span><span>K</span><span>A</span>
+            <div class="duka-logo-circle">
+                <span class="pts">نقاط</span>
+                <span class="brand">DUKA</span>
             </div>
+            <h1 class="main-title">أهلاً بك في برنامج نقاط عالم Duka</h1>
+            <p class="description">سجل حسابك الآن وابدأ بتجميع النقاط عند كل عملية شراء لمنتجات Duka واستبدلها بمكافآت رائعة.</p>
+            <button class="btn-splash-white" onclick="showPage('signup-page')">تسجيل حساب جديد</button>
+            <button class="btn-splash-red" onclick="showPage('login-page')">تسجيل الدخول</button>
         </div>
     </div>
 
     <div id="main-content">
-        
-        <!-- صفحة البداية -->
-        <div id="start-page" class="page active container">
-            <div class="logo-circle"><p style="color:#d63031; font-weight:bold; font-size:12px;">نقاط</p></div>
-            <h2>مرحباً بك في دوكا</h2>
-            <p style="font-size: 13px; margin: 10px 0;">هنا دوكا حيث الوطن</p>
-            <button class="btn btn-white" onclick="showPage('signup-page')">إنشاء حساب جديد</button>
-            <button class="btn btn-red" onclick="showPage('login-page')">تسجيل الدخول</button>
-        </div>
-
-        <!-- صفحة إنشاء حساب -->
-        <div id="signup-page" class="page container">
-            <h3>إنشاء حساب جديد</h3>
-            <input type="text" id="regName" placeholder="الاسم بالكامل">
-            <input type="email" id="regEmail" placeholder="البريد الإلكتروني">
-            <input type="tel" id="regPhone" placeholder="رقم الموبايل">
-            <button class="btn btn-red" onclick="handleSignup()">إتمام التسجيل</button>
-            <p class="back-link" onclick="showPage('start-page')">رجوع</p>
-        </div>
-
-        <!-- صفحة تسجيل الدخول -->
-        <div id="login-page" class="page container">
-            <h3>تسجيل الدخول</h3>
-            <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
-            <input type="tel" id="loginPhone" placeholder="رقم الموبايل">
-            <button class="btn btn-red" onclick="handleLogin()">دخول</button>
-            <p class="back-link" onclick="showPage('start-page')">رجوع</p>
-        </div>
-
-        <!-- لوحة التحكم -->
-        <div id="dashboard-page" class="page container">
-            <h3 id="welcomeUser">مرحباً</h3>
-            <div class="points-display">
-                <p>رصيد الكاش باك الحالي</p>
-                <div class="points-num" id="userPoints">0</div>
-                <p>جنيه مصري</p>
+        <div id="signup-page" class="page">
+            <div class="food-card">
+                <h2 style="text-align: center; margin-bottom: 20px; color:#d31111">حساب جديد</h2>
+                <div class="input-group">
+                    <label>الاسم</label>
+                    <input type="text" id="regName" placeholder="مثال: محمد علي">
+                </div>
+                <div class="input-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="regEmail" placeholder="example@mail.com">
+                </div>
+                <div class="input-group">
+                    <label>رقم الموبايل</label>
+                    <input type="tel" id="regPhone" placeholder="01xxxxxxxxx">
+                </div>
+                <button class="btn-action" onclick="handleSignup()">إتمام التسجيل</button>
+                <a class="back-link" onclick="location.reload()">رجوع</a>
             </div>
-            <div style="background:rgba(255,255,255,0.1); padding:10px; border-radius:10px;">
-                <label style="font-size:12px;">سجل قيمة الأوردر:</label>
-                <input type="number" id="orderVal" placeholder="المبلغ بالجنية">
-                <button class="btn btn-white" onclick="addOrder()">إضافة كاش باك (5%)</button>
-            </div>
-            <button class="btn btn-red" onclick="window.location.href='https://duka7.odoo.com'">الذهاب للمتجر 🛒</button>
-            <p class="back-link" onclick="logout()">خروج</p>
         </div>
 
+        <div id="login-page" class="page">
+            <div class="food-card">
+                <h2 style="text-align: center; margin-bottom: 20px; color:#d31111">تسجيل دخول</h2>
+                <div class="input-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="loginEmail" placeholder="example@mail.com">
+                </div>
+                <div class="input-group">
+                    <label>رقم الموبايل</label>
+                    <input type="tel" id="loginPhone" placeholder="01xxxxxxxxx">
+                </div>
+                <button class="btn-action" onclick="handleLogin()">دخول</button>
+                <a class="back-link" onclick="location.reload()">رجوع</a>
+            </div>
+        </div>
+
+        <div id="dashboard-page" class="page">
+            <div class="points-card">
+                <div>
+                    <h3 style="color: #d31111; margin-bottom: 5px;">رصيد الكاش باك</h3>
+                    <span class="points-number" id="cashbackBalance">0.00</span> جنيه
+                    <br>
+                    <button class="btn-reset" onclick="resetBalance()">
+                        <i class="fas fa-sync-alt"></i> إعادة تعيين الرصيد
+                    </button>
+                </div>
+                <div class="points-icon"><i class="fas fa-coins"></i></div>
+            </div>
+            <div class="food-card" style="text-align: center;">
+                <h3 id="welcomeUser" style="color: #d31111;">أهلاً بك</h3>
+                <p style="color: #777;">كل طلب يزيد رصيدك 5%</p>
+            </div>
+            <div class="food-card">
+                <h3 style="margin-bottom: 15px;"><i class="fas fa-cart-plus"></i> إضافة طلبية</h3>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <input type="number" id="orderAmount" value="100" style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd;">
+                    <button onclick="addOrder()" style="padding:10px 20px; background:#d31111; color:white; border:none; border-radius:10px;"><i class="fas fa-plus"></i></button>
+                </div>
+                <!-- الرابط المعدل حسب طلبك: https://duka.vatrin.app -->
+                <a href="https://duka.vatrin.app" target="_blank" style="text-decoration:none; background:#2d3e50; color:white; padding:12px; display:block; text-align:center; border-radius:10px;">تسوق من المتجر</a>
+            </div>
+            <button class="back-link" onclick="logout()" style="width:100%; border:none; background:none;">تسجيل خروج</button>
+        </div>
     </div>
 
     <script>
-        // 1. شاشة البداية
-        window.addEventListener('load', () => {
+        function showPage(pageId) {
+            document.getElementById('splash-screen').style.opacity = '0';
+            const iframe = document.getElementById('splash-video');
+            if(iframe) iframe.src = ''; 
             setTimeout(() => {
-                const splash = document.getElementById('splash-screen');
-                const main = document.getElementById('main-content');
-                
-                splash.style.opacity = '0';
-                setTimeout(() => {
-                    splash.style.display = 'none';
-                    main.style.display = 'flex';
-                }, 800);
-            }, 2500); // 2.5 ثانية مدة الحركة
-        });
-
-        // 2. التنقل بين الصفحات
-        function showPage(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+                document.getElementById('splash-screen').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById(pageId).classList.add('active');
+            }, 500);
         }
 
-        // 3. إنشاء حساب
+        function showAlert(msg) {
+            const alert = document.getElementById('customAlert');
+            alert.textContent = msg;
+            alert.classList.add('show');
+            setTimeout(() => alert.classList.remove('show'), 2500);
+        }
+
         function handleSignup() {
             const name = document.getElementById('regName').value.trim();
             const email = document.getElementById('regEmail').value.trim();
             const phone = document.getElementById('regPhone').value.trim();
-
-            if (!name || !email || !phone) {
-                alert("برجاء إكمال جميع البيانات");
-                return;
-            }
-
-            if (localStorage.getItem(email)) {
-                alert("هذا البريد مسجل بالفعل، يرجى تسجيل الدخول");
-                return;
-            }
-
-            const user = {
-                name: name,
-                email: email,
-                phone: phone,
-                points: 0
-            };
-
+            if (!name || !email || !phone) return showAlert('املأ جميع البيانات');
+            if (localStorage.getItem(email)) return showAlert('البريد مسجل مسبقاً');
+            const user = { name, email, phone, points: 0 };
             localStorage.setItem(email, JSON.stringify(user));
             loginUser(user);
         }
 
-        // 4. تسجيل الدخول
         function handleLogin() {
             const email = document.getElementById('loginEmail').value.trim();
             const phone = document.getElementById('loginPhone').value.trim();
-
-            if (!email || !phone) {
-                alert("برجاء إدخال البريد الإلكتروني ورقم الموبايل");
-                return;
-            }
-
-            const savedData = localStorage.getItem(email);
-            if (!savedData) {
-                alert("الحساب غير موجود، يرجى إنشاء حساب أولاً");
-                return;
-            }
-
-            const user = JSON.parse(savedData);
-            if (user.phone === phone) {
-                loginUser(user);
-            } else {
-                alert("رقم الموبايل غير صحيح");
-            }
+            const savedUser = localStorage.getItem(email);
+            if (!savedUser) return showAlert('الحساب غير موجود');
+            const user = JSON.parse(savedUser);
+            if (user.phone !== phone) return showAlert('رقم الموبايل خطأ');
+            loginUser(user);
         }
 
-        // 5. تسجيل دخول المستخدم
         function loginUser(user) {
             sessionStorage.setItem('currentUser', user.email);
-            document.getElementById('welcomeUser').innerText = "أهلاً " + user.name;
-            document.getElementById('userPoints').innerText = user.points.toFixed(2);
+            document.getElementById('welcomeUser').textContent = `أهلاً ${user.name}`;
+            document.getElementById('cashbackBalance').textContent = user.points.toFixed(2);
             showPage('dashboard-page');
         }
 
-        // 6. إضافة كاش باك
         function addOrder() {
-            const amount = parseFloat(document.getElementById('orderVal').value);
-            if (isNaN(amount) || amount <= 0) {
-                alert("برجاء إدخال مبلغ صحيح");
-                return;
-            }
-
+            const amount = parseFloat(document.getElementById('orderAmount').value);
             const email = sessionStorage.getItem('currentUser');
-            if (!email) {
-                alert("يجب تسجيل الدخول أولاً");
-                logout();
-                return;
-            }
-
             const user = JSON.parse(localStorage.getItem(email));
             user.points += amount * 0.05;
             localStorage.setItem(email, JSON.stringify(user));
-            document.getElementById('userPoints').innerText = user.points.toFixed(2);
-            document.getElementById('orderVal').value = "";
-            alert("تم إضافة الكاش باك بنجاح!");
+            document.getElementById('cashbackBalance').textContent = user.points.toFixed(2);
+            showAlert('تمت إضافة الكاش باك!');
         }
 
-        // 7. تسجيل الخروج
-        function logout() {
-            sessionStorage.clear();
-            showPage('start-page');
-        }
-
-        // 8. التحقق من وجود جلسة مسبقة
-        window.addEventListener('load', function() {
-            const currentEmail = sessionStorage.getItem('currentUser');
-            if (currentEmail) {
-                const userData = localStorage.getItem(currentEmail);
-                if (userData) {
-                    const user = JSON.parse(userData);
-                    loginUser(user);
-                } else {
-                    sessionStorage.clear();
-                }
+        function resetBalance() {
+            const email = sessionStorage.getItem('currentUser');
+            const user = JSON.parse(localStorage.getItem(email));
+            if (confirm("هل تريد تصفير الرصيد؟")) {
+                user.points = 0;
+                localStorage.setItem(email, JSON.stringify(user));
+                document.getElementById('cashbackBalance').textContent = "0.00";
             }
-        });
+        }
+
+        function logout() { sessionStorage.clear(); location.reload(); }
+
+        window.onload = () => {
+            const email = sessionStorage.getItem('currentUser');
+            if (email) {
+                const user = JSON.parse(localStorage.getItem(email));
+                if (user) loginUser(user);
+            }
+        };
     </script>
 </body>
 </html>
